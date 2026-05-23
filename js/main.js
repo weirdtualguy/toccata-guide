@@ -129,46 +129,48 @@ class App {
     }
 
     navigateToCategory(categoryKey, scrollToSectionId = null) {
-        if (!this.content) return;
-        
-        const category = this.content.categories[categoryKey];
-        if (!category) return;
+    if (!this.content) return;
+    
+    const category = this.content.categories[categoryKey];
+    if (!category) return;
 
-        this.currentCategory = categoryKey;
-        this.homeView.classList.add('hidden');
-        this.categoryView.classList.remove('hidden');
+    this.currentCategory = categoryKey;
+    this.homeView.classList.add('hidden');
+    this.categoryView.classList.remove('hidden');
 
-        this.categoryContent.innerHTML = `
-            <div class="category-view-header">
-                <h2>${category.icon} ${category.title}</h2>
-                <p>${category.description}</p>
-            </div>
-            <div class="accordion-container">
-                ${category.sections.map(section => this.renderAccordion(section)).join('')}
-            </div>
-        `;
+    this.categoryContent.innerHTML = `
+        <div class="category-view-header">
+            <h2>${category.icon} ${category.title}</h2>
+            <p>${category.description}</p>
+        </div>
+        <div class="accordion-container">
+            ${category.sections.map(section => this.renderAccordion(section)).join('')}
+        </div>
+    `;
 
-        this.initAccordions();
+    this.initAccordions();
 
-        this.categoryNav.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.category === categoryKey);
-        });
+    this.categoryNav.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.category === categoryKey);
+    });
 
+    // Scroll to the category content area on mobile
+    setTimeout(() => {
         if (scrollToSectionId) {
-            setTimeout(() => {
-                const section = document.getElementById(`section-${scrollToSectionId}`);
-                if (section) {
-                    const accordion = section.closest('.accordion');
-                    if (accordion) {
-                        accordion.classList.add('open');
-                    }
-                    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            const section = document.getElementById(`section-${scrollToSectionId}`);
+            if (section) {
+                const accordion = section.closest('.accordion');
+                if (accordion) {
+                    accordion.classList.add('open');
                 }
-            }, 400);
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                return;
+            }
         }
-
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+        // Fallback: scroll to the top of the category view
+        this.categoryView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+}
 
     renderAccordion(s) {
         return `<div class="accordion" id="section-${s.id}">
