@@ -22,8 +22,8 @@ class App {
         this.renderCategoryGrid();
         this.renderCategoryNav();
         this.setupNavigation();
+        this.setupProgressBar();
         
-        // Dispatch event for search manager
         document.dispatchEvent(new CustomEvent('contentLoaded', {
             detail: { content: this.content }
         }));
@@ -44,7 +44,7 @@ class App {
 
         this.categoryGrid.innerHTML = Object.entries(this.content.categories)
             .map(([key, cat]) => `
-                <div class="category-card" data-category="${key}" role="button" tabindex="0">
+                <div class="category-card" data-category="${key}" role="button" tabindex="0" aria-label="View ${cat.title} section">
                     <div class="card-icon">${cat.icon}</div>
                     <div class="card-title">${cat.title}</div>
                     <div class="card-desc">${cat.description}</div>
@@ -52,7 +52,6 @@ class App {
                 </div>
             `).join('');
 
-        // Click handlers for cards
         this.categoryGrid.querySelectorAll('.category-card').forEach(card => {
             card.addEventListener('click', () => {
                 this.navigateToCategory(card.dataset.category);
@@ -72,25 +71,23 @@ class App {
         const navInner = document.createElement('div');
         navInner.className = 'category-nav-inner';
 
-        // Add "Home" button
         navInner.innerHTML = `
-            <button class="category-nav-btn active" data-category="home">🏠 Home</button>
+            <button class="nav-btn active" data-category="home" aria-label="Go to home">🏠 Home</button>
         `;
 
-        // Add category buttons
         Object.entries(this.content.categories).forEach(([key, cat]) => {
             const btn = document.createElement('button');
-            btn.className = 'category-nav-btn';
+            btn.className = 'nav-btn';
             btn.dataset.category = key;
             btn.textContent = `${cat.icon} ${cat.shortTitle || cat.title}`;
+            btn.setAttribute('aria-label', `View ${cat.title}`);
             navInner.appendChild(btn);
         });
 
         this.categoryNav.innerHTML = '';
         this.categoryNav.appendChild(navInner);
 
-        // Click handlers
-        this.categoryNav.querySelectorAll('.category-nav-btn').forEach(btn => {
+        this.categoryNav.querySelectorAll('.nav-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 if (btn.dataset.category === 'home') {
                     this.navigateHome();
@@ -107,13 +104,24 @@ class App {
         });
     }
 
+    setupProgressBar() {
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+            const progressBar = document.getElementById('progressBar');
+            if (progressBar) {
+                progressBar.style.width = progress + '%';
+            }
+        });
+    }
+
     navigateHome() {
         this.homeView.classList.remove('hidden');
         this.categoryView.classList.add('hidden');
         this.currentCategory = null;
         
-        // Update nav active state
-        this.categoryNav.querySelectorAll('.category-nav-btn').forEach(btn => {
+        this.categoryNav.querySelectorAll('.nav-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.category === 'home');
         });
 
@@ -130,7 +138,6 @@ class App {
         this.homeView.classList.add('hidden');
         this.categoryView.classList.remove('hidden');
 
-        // Render category content
         this.categoryContent.innerHTML = `
             <div class="category-view-header">
                 <h2>${category.icon} ${category.title}</h2>
@@ -141,20 +148,12 @@ class App {
             </div>
         `;
 
-        // Initialize accordions
         this.initAccordions();
 
-        // Re-apply depth toggle
-        if (window.depthManager) {
-            window.depthManager.applyDepth();
-        }
-
-        // Update nav active state
-        this.categoryNav.querySelectorAll('.category-nav-btn').forEach(btn => {
+        this.categoryNav.querySelectorAll('.nav-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.category === categoryKey);
         });
 
-        // Scroll to specific section if requested
         if (scrollToSectionId) {
             setTimeout(() => {
                 const section = document.getElementById(`section-${scrollToSectionId}`);
@@ -165,58 +164,37 @@ class App {
                     }
                     section.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
-            }, 300);
+            }, 400);
         }
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    renderAccordion(section) {
-        return `
-            <div class="accordion" id="section-${section.id}">
-                <div class="accordion-header" role="button" tabindex="0" aria-expanded="false">
-                    <h3>${section.title}</h3>
-                    <span class="accordion-arrow">▼</span>
-                </div>
-                <div class="accordion-body">
-                    <div class="content-version simple-content active" data-version="simple">
-                        ${this.renderSimpleContent(section.simple)}
-                    </div>
-                    <div class="content-version technical-content" data-version="technical">
-                        ${this.renderTechnicalContent(section.technical)}
-                    </div>
-                    ${section.specs_link ? `<a href="${section.specs_link}" class="specs-link" target="_blank" rel="noopener">📋 View full specification →</a>` : ''}
+    renderAccordion(s) {
+        return `<div class="accordion" id="section-${s.id}">
+            <div class="accordion-header" role="button" tabindex="0" aria-expanded="false">
+                <h3>${s.title}</h3>
+                <span class="accordion-arrow">▼</span>
+            </div>
+            <div class="accordion-body">
+                <div class="section-content">
+                    ${this.renderSection(s)}
                 </div>
             </div>
-        `;
+        </div>`;
     }
 
-    renderSimpleContent(simple) {
-        if (!simple) return '<p>Simple explanation coming soon.</p>';
-        
+    renderSection(s) {
         return `
-            <div class="summary">${simple.summary}</div>
-            ${simple.details ? `<p>${simple.details}</p>` : ''}
-            ${simple.problem ? `<h4>The Problem</h4><p>${simple.problem}</p>` : ''}
-            ${simple.how_it_works ? `<h4>How It Works</h4><p>${simple.how_it_works}</p>` : ''}
-            ${simple.analogy ? `<h4>Think of It Like...</h4><p>${simple.analogy}</p>` : ''}
-            ${simple.key_takeaway ? `<div class="key-takeaway"><strong>Key Takeaway:</strong> ${simple.key_takeaway}</div>` : ''}
-            ${simple.bullets ? `<ul>${simple.bullets.map(b => `<li>${b}</li>`).join('')}</ul>` : ''}
-        `;
-    }
-
-    renderTechnicalContent(technical) {
-        if (!technical) return '<p>Technical explanation coming soon.</p>';
-        
-        return `
-            <div class="summary">${technical.summary}</div>
-            ${technical.details ? `<p>${technical.details}</p>` : ''}
-            ${technical.mechanism ? `<h4>Mechanism</h4><p>${technical.mechanism}</p>` : ''}
-            ${technical.code_example ? `<h4>Code Example</h4><pre><code>${this.escapeHtml(technical.code_example)}</code></pre>` : ''}
-            ${technical.security ? `<h4>Security Properties</h4><p>${technical.security}</p>` : ''}
-            ${technical.key_takeaway ? `<div class="key-takeaway"><strong>Key Takeaway:</strong> ${technical.key_takeaway}</div>` : ''}
-            ${technical.bullets ? `<ul>${technical.bullets.map(b => `<li>${b}</li>`).join('')}</ul>` : ''}
-            ${technical.specs_link ? `<a href="${technical.specs_link}" class="specs-link" target="_blank" rel="noopener">📋 View KIP specification →</a>` : ''}
+            ${s.reality_shift ? `<div class="block"><h4>Reality Shift</h4><p>${s.reality_shift}</p></div>` : ''}
+            ${s.mental_model ? `<div class="block"><h4>Mental Model</h4><p>${s.mental_model}</p></div>` : ''}
+            ${s.mechanism ? `<div class="block"><h4>Mechanism</h4><p>${s.mechanism}</p></div>` : ''}
+            ${s.implications ? `<div class="block"><h4>Implications</h4><p>${s.implications}</p></div>` : ''}
+            ${s.constraints ? `<div class="block"><h4>Constraints</h4><p>${s.constraints}</p></div>` : ''}
+            ${s.system_position ? `<div class="block"><h4>System Position</h4><p>${s.system_position}</p></div>` : ''}
+            ${s.insight ? `<div class="insight-box">${s.insight}</div>` : ''}
+            ${s.bullets ? `<ul>${s.bullets.map(b => `<li>${b}</li>`).join('')}</ul>` : ''}
+            ${s.specs_link ? `<a href="${s.specs_link}" class="specs-link" target="_blank" rel="noopener">📋 View specification →</a>` : ''}
         `;
     }
 
