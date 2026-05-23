@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Toccata: A Field Guide — Understanding Kaspa's programmable upgrade, for everyone.">
+    <meta name="theme-color" content="#0a0f14">
+    <title>Toccata: A Field Guide</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>Toccata <span class="subtitle">A Field Guide</span></h1>
+            <p class="tagline">Understanding Kaspa's programmable upgrade — for everyone.</p>
+        </div>
+        <div class="header-controls">
+            <div class="depth-control">
+                <button id="depthToggle" class="depth-toggle" aria-label="Toggle between simple and technical explanations">
+                    <span class="toggle-simple active">Simple</span>
+                    <span class="toggle-divider">|</span>
+                    <span class="toggle-technical">Technical</span>
+                </button>
+            </div>
+            <div class="search-container">
+                <input type="search" id="searchInput" placeholder="Search the guide..." aria-label="Search content">
+                <div id="searchResults" class="search-results hidden"></div>
+            </div>
+        </div>
+    </header>
+
+    <nav id="categoryNav" class="category-nav" aria-label="Category navigation">
+        <!-- Populated by main.js from content.json -->
+    </nav>
+
+    <main id="mainContent" class="main-content">
+        <section id="homeView" class="home-view">
+            <div class="category-grid" id="categoryGrid">
+                <!-- Populated by main.js -->
+            </div>
+        </section>
+        <section id="categoryView" class="category-view hidden">
+            <button id="backButton" class="back-button" aria-label="Back to all categories">← All Categories</button>
+            <div id="categoryContent">
+                <!-- Populated dynamically -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Toccata hard fork — June 2026. This guide is a community resource, not affiliated with the Kaspa development team.</p>
+        <p>Built for clarity. Updated as specifications evolve.</p>
+    </footer>
+
+    <script src="js/depth-toggle.js"></script>
+    <script src="js/search.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+</body>
+</html>

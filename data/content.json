@@ -1,0 +1,296 @@
+{
+  "categories": {
+    "what-is-toccata": {
+      "title": "What is Toccata?",
+      "shortTitle": "Overview",
+      "icon": "🎼",
+      "description": "The big picture: what this upgrade is, when it happens, and why it matters.",
+      "sections": [
+        {
+          "id": "overview",
+          "title": "Overview",
+          "simple": {
+            "summary": "Toccata is a major upgrade to the Kaspa network that makes it programmable for the first time.",
+            "problem": "Before Toccata, Kaspa could only send and receive its native currency (KAS). That's it. You couldn't build applications on it — no decentralized exchanges, no lending protocols, no automated vaults.",
+            "how_it_works": "Toccata adds two new capabilities: (1) a programming language called SilverScript that lets developers write rules directly into Kaspa coins, and (2) a system for verifying complex computations using zero-knowledge proofs. Together, these turn Kaspa from a simple payment network into a programmable platform.",
+            "key_takeaway": "Toccata is the moment Kaspa gains the ability to run applications — not on a separate layer, but directly on its base network."
+          },
+          "technical": {
+            "summary": "Toccata is a non-backward-compatible protocol hard fork that introduces native L1 covenant programming via SilverScript and based zero-knowledge application infrastructure to the Kaspa network.",
+            "details": "The hard fork activates new opcodes in Kaspa Script, including a Groth16 verifier and RISC Zero STARK verifier. It introduces KIP-10 introspection opcodes (enabling UTXOs to inspect spending transactions), KIP-17 byte primitives (complex data serialization within script constraints), and KIP-21 partitioned sequencing (scaling ZK proof costs proportional to application activity rather than global network throughput).",
+            "specs_link": "https://github.com/kaspanet/kips"
+          }
+        },
+        {
+          "id": "timing",
+          "title": "When Does It Happen?",
+          "simple": {
+            "summary": "Toccata is scheduled to activate in June 2026.",
+            "details": "The hard fork window opens June 5 and closes June 20, 2026. During this window, miners and node operators must upgrade their software. Once a sufficient majority has upgraded, the new rules take effect automatically.",
+            "key_takeaway": "If you hold KAS in a wallet, you don't need to do anything. The upgrade is at the network level."
+          },
+          "technical": {
+            "summary": "Toccata activates via a hard fork with a defined activation window (June 5–20, 2026) using miner signaling for coordination.",
+            "mechanism": "Nodes signal readiness by setting a protocol version bit. Once the threshold percentage of blocks within a difficulty window signal readiness, activation locks in. After a grace period, new consensus rules (including new opcodes) become enforced.",
+            "key_takeaway": "All full nodes and miners must upgrade to a Toccata-compatible client before activation. Non-upgraded nodes will fork off the network."
+          }
+        },
+        {
+          "id": "why-toccata",
+          "title": "Why Is It Called Toccata?",
+          "simple": {
+            "summary": "Kaspa follows a musical naming convention. A toccata is a virtuosic musical piece designed to showcase technical skill — fitting for an upgrade that dramatically expands what the network can do.",
+            "key_takeaway": "Like the musical form, this upgrade demonstrates technical virtuosity: fitting complex programmability into Kaspa's fast, lean architecture."
+          },
+          "technical": {
+            "summary": "Toccata continues the musical naming convention (following Crescendo, Forte, etc.). A toccata (from Italian 'toccare' — to touch) is a musical form emphasizing dexterity and speed, reflecting the upgrade's focus on efficient, native execution rather than external virtual machines."
+          }
+        }
+      ]
+    },
+    "silverscript": {
+      "title": "SilverScript",
+      "shortTitle": "SilverScript",
+      "icon": "🧱",
+      "description": "The new programming language that brings smart contracts to Kaspa's base layer.",
+      "sections": [
+        {
+          "id": "what-is-silverscript",
+          "title": "What is SilverScript?",
+          "simple": {
+            "summary": "SilverScript is a new programming language that lets developers write rules for how Kaspa coins behave.",
+            "problem": "Before Toccata, a Kaspa coin was just a coin. You could send it, receive it, hold it. Nothing else. There was no way to create a coin that locked for 30 days, or required two signatures, or automatically distributed value across multiple recipients.",
+            "how_it_works": "SilverScript lets developers write these rules in a human-readable language. The rules get compiled into code that lives inside the coin itself. When someone tries to spend that coin, the network checks the rules. If they're not followed, the transaction is automatically rejected.",
+            "analogy": "A regular cryptocurrency transaction is like handing someone cash — they can do whatever they want with it. A SilverScript covenant is like a check with conditions written on it: 'only payable to Alice, only after June 1st, and only for exactly 100 KAS.'",
+            "key_takeaway": "SilverScript is the foundation for everything Toccata enables. Vaults, exchanges, escrow — all of it starts with coins that can enforce rules on themselves."
+          },
+          "technical": {
+            "summary": "SilverScript is a high-level, statically-typed smart contract language compiling to native Kaspa Script opcodes, designed specifically for UTXO-based covenant programming.",
+            "mechanism": "SilverScript compiles to bytecode utilizing KIP-10 introspection opcodes (allowing a UTXO to inspect the transaction attempting to spend it) and KIP-17 byte primitives (enabling complex data serialization within script constraints). The compiled bytecode is placed in the ScriptPubKey of covenant UTXOs.",
+            "code_example": "contract TimeLockedVault {\n    owner: Address;\n    unlock_block: u64;\n    \n    pub fn spend(self, ctx: SpendContext) -> bool {\n        ctx.block_height >= self.unlock_block\n        && ctx.signer == self.owner\n    }\n}",
+            "security": "Each covenant's state is isolated to its UTXO chain. A vulnerability in one contract cannot affect another. Failed covenant validation reverts only that specific UTXO spend — atomic failure without global state corruption. This eliminates reentrancy attack vectors inherent in shared-state (account-based) architectures.",
+            "key_takeaway": "SilverScript brings programmability to Kaspa's UTXO model without introducing the security pitfalls of shared global state."
+          }
+        },
+        {
+          "id": "covenants",
+          "title": "How Covenants Work",
+          "simple": {
+            "summary": "A covenant is a set of rules attached to a specific coin that controls how it can be spent — not just who can spend it.",
+            "details": "Normally, if you have a coin, anyone with the private key can spend it however they want. A covenant changes this: even the owner must follow the rules. For example, a covenant might say 'this coin can only be spent 1,000 blocks after it was created' — creating a forced time delay that even the owner can't bypass.",
+            "key_takeaway": "Covenants turn individual coins into mini-programs. Each one enforces its own rules, independently of all others."
+          },
+          "technical": {
+            "summary": "Covenants are spending condition scripts embedded in UTXO ScriptPubKeys that constrain future transaction structure, not just signature verification.",
+            "mechanism": "Using KIP-10 introspection opcodes, a covenant script can inspect: the spending transaction's inputs and outputs, the block height, the transaction fee, and other structural properties. This enables state machines where each UTXO represents a step in a multi-stage protocol, with the covenant enforcing valid state transitions.",
+            "code_example": "// A covenant that enforces a specific output address\ncontract FixedDestination {\n    destination: Address;\n    \n    pub fn spend(self, ctx: SpendContext) -> bool {\n        ctx.outputs.len() == 1\n        && ctx.outputs[0].address == self.destination\n    }\n}",
+            "key_takeaway": "Covenants enable Turing-complete state machines on UTXOs by constraining how coins can be spent across sequential transactions."
+          }
+        }
+      ]
+    },
+    "zk-applications": {
+      "title": "ZK Applications",
+      "shortTitle": "ZK Apps",
+      "icon": "🔐",
+      "description": "How zero-knowledge proofs bring private, scalable computation to Kaspa.",
+      "sections": [
+        {
+          "id": "what-are-zk-apps",
+          "title": "What Are ZK Applications?",
+          "simple": {
+            "summary": "Zero-Knowledge (ZK) applications let complex programs run off-chain, with only a tiny cryptographic proof submitted to Kaspa for verification.",
+            "problem": "Running complex programs directly on a blockchain is slow and expensive. If every node had to execute every smart contract, the network would grind to a halt under heavy use.",
+            "how_it_works": "With ZK applications, the heavy computation happens off-chain. A cryptographic proof (like a digital receipt) is generated that proves the computation was done correctly. This proof is tiny — a few hundred bytes — and can be verified by the Kaspa network in milliseconds. The network doesn't need to re-run the program; it just checks the proof.",
+            "analogy": "Imagine you solve a complex Sudoku puzzle. Instead of having everyone re-solve it to verify you're right, you provide a mathematical proof that confirms your solution is correct. Everyone can verify the proof instantly without doing the work of solving the puzzle themselves.",
+            "key_takeaway": "ZK applications keep Kaspa fast by moving computation off-chain while keeping verification on-chain. You get complex apps without slowing the network."
+          },
+          "technical": {
+            "summary": "Based ZK applications execute computation off-chain and submit validity proofs for L1 verification via new native opcodes (Groth16 verifier, RISC Zero STARK verifier) introduced in Toccata.",
+            "mechanism": "The 'based' designation means these applications are fully anchored to Kaspa's L1 sequencing — they cannot reorder or censor transactions independently. The canonical bridge (via KIP-10) allows ZK proofs to spend State UTXOs, cryptographically guaranteeing that state transitions follow application rules. KIP-21 partitioned sequencing ensures proof verification costs scale with individual application activity, not global throughput.",
+            "security": "Proof verification is deterministic and trustless. The Groth16 verifier opcode enables succinct proofs for specific circuits. The RISC Zero STARK verifier supports general-purpose computation proofs via the RISC-V instruction set, enabling arbitrary off-chain programs to generate L1-verifiable proofs.",
+            "key_takeaway": "Based ZK applications provide scalable, private computation with L1 security guarantees without burdening full nodes with execution."
+          }
+        }
+      ]
+    },
+    "zk-opcodes": {
+      "title": "ZK Opcodes",
+      "shortTitle": "ZK Opcodes",
+      "icon": "⚙️",
+      "description": "The new low-level operations that make zero-knowledge verification possible directly on Kaspa.",
+      "sections": [
+        {
+          "id": "groth16",
+          "title": "Groth16 Verifier",
+          "simple": {
+            "summary": "Groth16 is a type of zero-knowledge proof that is extremely fast to verify. Toccata adds a native operation that can check these proofs directly in Kaspa transactions.",
+            "key_takeaway": "Groth16 proofs are the most efficient ZK proofs for specific, pre-defined computations. They verify in milliseconds."
+          },
+          "technical": {
+            "summary": "Toccata introduces a native Groth16 verifier opcode enabling on-chain verification of pairing-based zk-SNARK proofs within Kaspa Script.",
+            "mechanism": "The opcode accepts a Groth16 proof (three elliptic curve points) and verification key, performing pairing checks over the BN254 (or BLS12-381) curve natively. This enables privacy-preserving transactions, verifiable computation, and trustless bridges without external verifier contracts.",
+            "key_takeaway": "Native Groth16 verification eliminates the need for expensive on-chain verifier contracts, reducing proof verification cost to a single opcode execution."
+          }
+        },
+        {
+          "id": "stark",
+          "title": "RISC Zero STARK Verifier",
+          "simple": {
+            "summary": "STARK proofs can verify any computation, not just specific ones. Toccata includes a verifier that can check STARK proofs generated by the RISC Zero system.",
+            "key_takeaway": "STARKs are more flexible than Groth16 — they can prove arbitrary programs — and are quantum-resistant. The tradeoff is slightly larger proof sizes."
+          },
+          "technical": {
+            "summary": "The RISC Zero STARK verifier opcode enables on-chain verification of STARK proofs generated by programs compiled to the RISC-V instruction set.",
+            "mechanism": "RISC Zero uses the RISC-V ISA as its computation model. Any program compilable to RISC-V can generate a STARK proof of correct execution. The verifier opcode checks this proof natively, enabling general-purpose verifiable computation without circuit-specific setup (unlike Groth16's trusted setup requirement).",
+            "key_takeaway": "RISC Zero STARK verification brings general-purpose, trustless-setup verifiable computation to Kaspa's L1."
+          }
+        }
+      ]
+    },
+    "kip-specifications": {
+      "title": "KIP Specifications",
+      "shortTitle": "KIPs",
+      "icon": "📋",
+      "description": "The formal Kaspa Improvement Proposals that define Toccata's technical standards.",
+      "sections": [
+        {
+          "id": "kip-10",
+          "title": "KIP-10: Introspection Opcodes",
+          "simple": {
+            "summary": "KIP-10 adds operations that let a coin 'look at' the transaction trying to spend it — enabling coins to enforce rules about how they can be spent.",
+            "key_takeaway": "Without KIP-10, a coin can only check signatures. With KIP-10, it can check the entire spending transaction — outputs, amounts, block height, and more."
+          },
+          "technical": {
+            "summary": "KIP-10 introduces a set of opcodes enabling UTXO scripts to introspect the structure of the spending transaction, including inputs, outputs, amounts, and block context.",
+            "key_takeaway": "KIP-10 is the foundation for all covenant programming on Kaspa. It enables the canonical bridge for ZK applications."
+          }
+        },
+        {
+          "id": "kip-17",
+          "title": "KIP-17: Byte Primitives",
+          "simple": {
+            "summary": "KIP-17 adds operations for handling complex data within Kaspa scripts — essential for smart contracts that need to process structured information.",
+            "key_takeaway": "KIP-17 enables SilverScript to handle arrays, structs, and other complex data types within covenant scripts."
+          },
+          "technical": {
+            "summary": "KIP-17 introduces byte manipulation primitives to Kaspa Script, including concatenation, slicing, and parsing operations necessary for complex data serialization in covenant state machines.",
+            "key_takeaway": "Without KIP-17, scripts are limited to simple arithmetic and hashing. KIP-17 enables structured data handling required by real-world smart contracts."
+          }
+        },
+        {
+          "id": "kip-21",
+          "title": "KIP-21: Partitioned Sequencing",
+          "simple": {
+            "summary": "KIP-21 ensures that using ZK applications stays affordable — the cost to verify a proof scales only with that specific application's activity, not the entire network's.",
+            "key_takeaway": "One busy app won't make all other apps expensive. KIP-21 isolates costs."
+          },
+          "technical": {
+            "summary": "KIP-21 partitions sequencing commitments so that ZK proof verification costs are proportional to individual application throughput rather than global network activity.",
+            "mechanism": "By sharding the commitment structure, each based ZK application maintains its own proof cost scaling curve. This prevents a single high-throughput application from increasing verification costs for all other applications, solving the fee-spillover problem present in monolithic rollup architectures.",
+            "key_takeaway": "KIP-21 is critical for scalable ZK infrastructure — it prevents any single application from congesting the L1 verification pipeline."
+          }
+        }
+      ]
+    },
+    "atomic-composability": {
+      "title": "Atomic Composability",
+      "shortTitle": "Composability",
+      "icon": "🔗",
+      "description": "How different smart contracts interact seamlessly in a single transaction.",
+      "sections": [
+        {
+          "id": "what-is-atomic-composability",
+          "title": "What Is Atomic Composability?",
+          "simple": {
+            "summary": "Atomic composability means multiple smart contracts can interact in a single transaction that either fully succeeds or fully fails — no partial execution.",
+            "problem": "On some blockchains, contracts on different 'rollups' can't interact directly. Each interaction requires separate transactions, introducing delays and failure risks.",
+            "how_it_works": "Toccata enables 'based rollups' where transaction ordering is done by the L1 itself. This means all contracts see the same ordered sequence, enabling synchronous calls between them — all in one atomic transaction.",
+            "analogy": "It's like a vending machine: you put money in, make your selection, and either the item drops AND your change comes out (success), or nothing happens (failure). You never get the item without paying, or pay without getting the item. Atomic composability brings this 'all or nothing' guarantee to multi-contract interactions.",
+            "key_takeaway": "Atomic composability means complex financial operations — like flash loans or multi-step trades — execute securely in one transaction on Kaspa."
+          },
+          "technical": {
+            "summary": "Atomic composability on Toccata is achieved through based rollup architecture where L1 validators handle transaction ordering, enabling synchronous cross-contract calls within a single atomic transaction.",
+            "mechanism": "Unlike Ethereum's sequencer-based L2s where cross-rollup communication is asynchronous, Toccata's based ZK applications post all data to L1 where it's ordered by the base consensus layer. This enables a single transaction to call functions across multiple covenants or ZK applications, with atomic success or failure guaranteed by L1 execution.",
+            "key_takeaway": "Based sequencing eliminates the fragmentation problem: contracts on different 'zones' interact atomically with no asynchronous latency."
+          }
+        }
+      ]
+    },
+    "canonical-bridge": {
+      "title": "The Canonical Bridge",
+      "shortTitle": "Bridge",
+      "icon": "🌉",
+      "description": "How ZK proofs interact with on-chain state through the canonical bridge mechanism.",
+      "sections": [
+        {
+          "id": "what-is-canonical-bridge",
+          "title": "What Is the Canonical Bridge?",
+          "simple": {
+            "summary": "The canonical bridge is the mechanism that lets a zero-knowledge proof 'spend' a special UTXO, cryptographically guaranteeing that the result follows all the rules of the off-chain application.",
+            "how_it_works": "A 'State UTXO' holds the current state of a ZK application. When the application processes transactions off-chain, it generates a ZK proof. This proof is submitted to the L1 along with a transaction that spends the State UTXO. The canonical bridge verifies the proof and, if valid, allows the State UTXO to transition to its new state.",
+            "key_takeaway": "The canonical bridge is the secure handshake between off-chain computation and on-chain state. It's what makes 'based ZK' possible."
+          },
+          "technical": {
+            "summary": "The canonical bridge (implemented via KIP-10 introspection) is the mechanism by which ZK validity proofs authorize state transitions on L1 UTXOs, cryptographically linking off-chain execution to on-chain settlement.",
+            "mechanism": "A State UTXO's covenant script includes verification of a ZK proof against a circuit that encodes the application's state transition rules. When spending, the proof is provided as a witness, verified by the native ZK opcodes (Groth16 or STARK), and if valid, the state transition executes. This creates a trustless bridge: L1 doesn't execute the program, but cryptographically verifies its correct execution.",
+            "key_takeaway": "The canonical bridge is the core primitive enabling trustless ZK rollups on Kaspa — it eliminates the need for fraud proofs or challenge periods."
+          }
+        }
+      ]
+    },
+    "developer-quickstart": {
+      "title": "Developer Quickstart",
+      "shortTitle": "Dev Quickstart",
+      "icon": "🛠️",
+      "description": "Get started building on Toccata with SilverScript and ZK tools.",
+      "sections": [
+        {
+          "id": "getting-started",
+          "title": "Getting Started",
+          "simple": {
+            "summary": "To start building on Toccata, you'll need a Kaspa node (Toccata-compatible), the SilverScript compiler, and optionally the RISC Zero toolchain for ZK applications.",
+            "details": "Full setup guides will be available at the Kaspa developer portal as Toccata approaches activation. For now, you can explore the KIP specifications and SilverScript language design documents.",
+            "key_takeaway": "If you're a developer, start by reading KIP-10, KIP-17, and the SilverScript language specification to understand the programming model."
+          },
+          "technical": {
+            "summary": "Development on Toccata requires: (1) a kaspa-node with Toccata activation, (2) the SilverScript compiler (`silverscriptc`), (3) for ZK apps: the RISC Zero zkVM toolchain.",
+            "code_example": "# Install SilverScript compiler\ncargo install silverscriptc\n\n# Compile a covenant\nsilverscriptc build --contract vault.ss\n\n# Deploy to testnet\nkaspa-cli deploy --contract vault.bin --args '{\"owner\":\"...\",\"unlock_block\":1000000}'",
+            "specs_link": "https://github.com/kaspanet/kips"
+          }
+        }
+      ]
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "shortTitle": "FAQ",
+      "icon": "❓",
+      "description": "Common questions about Toccata, answered for both audiences.",
+      "sections": [
+        {
+          "id": "faq-general",
+          "title": "General Questions",
+          "simple": {
+            "summary": "Do I need to do anything? Will my KAS be affected? Does this change Kaspa's speed or supply?",
+            "bullets": [
+              "No, if you hold KAS in a wallet, you don't need to take any action. The upgrade is at the network level.",
+              "Your KAS is safe. Toccata doesn't change the monetary policy, total supply, or emission schedule.",
+              "Toccata maintains Kaspa's 10 BPS speed. It adds programmability without slowing the network.",
+              "Transaction fees remain extremely low. The new features don't increase costs for regular transfers."
+            ]
+          },
+          "technical": {
+            "summary": "Toccata is a consensus-level hard fork. Non-upgraded nodes will fork off. KAS holders using custodial services should verify their provider is upgrading.",
+            "bullets": [
+              "Full nodes and miners MUST upgrade to a Toccata-compatible client before the activation window.",
+              "The 28.7B KAS supply cap is unchanged. Toccata only adds scripting capabilities, not new monetary policy.",
+              "The 10 BPS block rate is maintained. ZK verification opcodes are designed for O(1) execution time.",
+              "SilverScript covenant execution is bounded by script gas limits — complex covenants may require slightly higher fees.",
+              "KIP-21 partitioned sequencing ensures ZK verification costs scale per-application, preventing global fee increases."
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
