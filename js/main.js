@@ -220,3 +220,10 @@ class App {
 document.addEventListener('DOMContentLoaded', () => {
     window.app = new App();
 });
+
+// Force service worker to check for updates
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistration().then(reg => {
+        if (reg) reg.update();
+    });
+}
