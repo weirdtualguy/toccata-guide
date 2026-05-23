@@ -1,15 +1,14 @@
 // Service Worker for offline caching
-const CACHE_NAME = 'toccata-guide-v1';
-
-const PRECACHE_ASSETS = [
+const CACHE = 'toccata-v2'
+const ASSETS = [
     './index.html',
     './css/style.css',
     './js/main.js',
-    './js/depth-toggle.js',
     './js/search.js',
     './data/content.json',
-    './manifest.json'
-];
+    './manifest.json',
+    './assets/icons/icon.svg'
+]
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
