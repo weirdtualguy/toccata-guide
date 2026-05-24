@@ -298,6 +298,7 @@ header {
 .category-view {
     animation: fadeIn 0.4s ease;
     scroll-margin-top: 80px;
+    padding-bottom: 3rem;
 }
 
 @keyframes fadeIn {
@@ -336,12 +337,12 @@ header {
     background: transparent;
     border: 1px solid var(--border);
     color: var(--text-secondary);
-    padding: 0.4rem 0.8rem;
+    padding: 0.5rem 0.9rem;
     border-radius: 20px;
     cursor: pointer;
     font-size: 0.8rem;
     font-family: var(--font-body);
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
     transition: all 0.2s ease;
 }
 
@@ -358,6 +359,10 @@ header {
 /* ========== ACCORDION ========== */
 .accordion {
     margin-bottom: 1rem;
+}
+
+.accordion:last-of-type {
+    margin-bottom: 0.5rem;
 }
 
 .accordion-header {
@@ -501,17 +506,17 @@ footer p {
 
 /* ========== PROTOCOL FOOTER ========== */
 .protocol-footer {
-    padding: 3rem 1.5rem 2rem;
+    padding: 2rem 1.5rem 1.5rem;
     text-align: center;
-    max-width: 640px;
-    margin: 0 auto;
+    border-top: 1px solid var(--border);
+    margin-top: 3rem;
 }
 
 .footer-rule {
     width: 40px;
     height: 1px;
     background: var(--border-light);
-    margin: 0 auto 2rem;
+    margin: 0 auto 1.5rem;
 }
 
 .footer-note {
@@ -519,7 +524,7 @@ footer p {
     font-size: 0.78rem;
     color: var(--text-muted);
     line-height: 1.6;
-    margin-bottom: 1.8rem;
+    margin-bottom: 1.2rem;
     font-weight: 400;
 }
 
@@ -529,7 +534,7 @@ footer p {
     align-items: center;
     gap: 0;
     flex-wrap: wrap;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .footer-link {
@@ -586,12 +591,12 @@ footer p {
     font-size: 0.7rem;
     color: var(--text-muted);
     opacity: 0.5;
-    margin-top: 0.5rem;
+    margin-top: 0.3rem;
 }
 
 /* Remove old footer */
-body > footer:not(.protocol-footer) {
-    display: none;
+body > footer:first-of-type {
+    display: none !important;
 }
 
 /* ========== MODALS ========== */
