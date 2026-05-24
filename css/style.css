@@ -173,11 +173,13 @@ header {
 .category-nav {
     background: var(--bg-secondary);
     border-bottom: 1px solid var(--border);
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 0.75rem;
     overflow-x: auto;
+    overflow-y: hidden;
     white-space: nowrap;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
 .category-nav::-webkit-scrollbar {
@@ -187,8 +189,11 @@ header {
 .category-nav-inner {
     display: flex;
     gap: 0.4rem;
-    justify-content: center;
     flex-wrap: nowrap;
+    width: max-content;
+    min-width: 100%;
+    justify-content: flex-start;
+    padding: 0 0.25rem;
 }
 
 .nav-btn {
@@ -198,7 +203,7 @@ header {
     background: transparent;
     border: 1px solid transparent;
     color: var(--text-secondary);
-    padding: 0.35rem 0.7rem;
+    padding: 0.4rem 0.75rem;
     border-radius: 20px;
     cursor: pointer;
     font-size: 0.78rem;
@@ -206,6 +211,7 @@ header {
     font-weight: 400;
     transition: all 0.2s ease;
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .nav-btn:hover {
