@@ -506,25 +506,22 @@ footer p {
 
 /* ========== PROTOCOL FOOTER ========== */
 .protocol-footer {
-    padding: 2rem 1.5rem 1.5rem;
+    padding: 1.5rem 1.5rem 1.5rem;
     text-align: center;
     border-top: 1px solid var(--border);
     margin-top: 3rem;
 }
 
 .footer-rule {
-    width: 40px;
-    height: 1px;
-    background: var(--border-light);
-    margin: 0 auto 1.5rem;
+    display: none;
 }
 
 .footer-note {
     font-family: var(--font-body);
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     color: var(--text-muted);
-    line-height: 1.6;
-    margin-bottom: 1.2rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
     font-weight: 400;
 }
 
@@ -534,7 +531,7 @@ footer p {
     align-items: center;
     gap: 0;
     flex-wrap: wrap;
-    margin-bottom: 1rem;
+    margin-bottom: 0.8rem;
 }
 
 .footer-link {
@@ -542,10 +539,10 @@ footer p {
     border: none;
     color: var(--text-muted);
     font-family: var(--font-body);
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 400;
     cursor: pointer;
-    padding: 0.3rem 0.6rem;
+    padding: 0.25rem 0.5rem;
     text-decoration: none;
     transition: color 0.2s ease;
     display: inline-flex;
@@ -568,7 +565,7 @@ footer p {
 }
 
 .footer-link .link-arrow {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     opacity: 0.5;
     transition: opacity 0.2s ease;
 }
@@ -580,23 +577,17 @@ footer p {
 .footer-sep {
     display: inline-block;
     width: 1px;
-    height: 12px;
+    height: 10px;
     background: var(--border);
-    margin: 0 0.6rem;
-    opacity: 0.5;
+    margin: 0 0.5rem;
+    opacity: 0.4;
 }
 
 .footer-close {
     font-family: var(--font-body);
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     color: var(--text-muted);
-    opacity: 0.5;
-    margin-top: 0.3rem;
-}
-
-/* Remove old footer */
-body > footer:first-of-type {
-    display: none !important;
+    opacity: 0.4;
 }
 
 /* ========== MODALS ========== */
