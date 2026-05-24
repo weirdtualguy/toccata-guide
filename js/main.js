@@ -227,3 +227,113 @@ if ('serviceWorker' in navigator) {
         if (reg) reg.update();
     });
 }
+
+// ========== FOOTER MODALS ==========
+document.addEventListener('DOMContentLoaded', () => {
+    // Support modal
+    const supportBtn = document.getElementById('supportBtn');
+    const supportModal = document.getElementById('supportModal');
+    const closeSupportModal = document.getElementById('closeSupportModal');
+    
+    if (supportBtn && supportModal && closeSupportModal) {
+        supportBtn.addEventListener('click', () => {
+            supportModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        closeSupportModal.addEventListener('click', () => {
+            supportModal.classList.add('hidden');
+            document.body.style.overflow = '';
+        });
+        
+        supportModal.addEventListener('click', (e) => {
+            if (e.target === supportModal) {
+                supportModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        });
+    }
+    
+    // Contribute modal
+    const contributeBtn = document.getElementById('contributeBtn');
+    const contributeModal = document.getElementById('contributeModal');
+    const closeContributeModal = document.getElementById('closeContributeModal');
+    
+    if (contributeBtn && contributeModal && closeContributeModal) {
+        contributeBtn.addEventListener('click', () => {
+            contributeModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        closeContributeModal.addEventListener('click', () => {
+            contributeModal.classList.add('hidden');
+            document.body.style.overflow = '';
+        });
+        
+        contributeModal.addEventListener('click', (e) => {
+            if (e.target === contributeModal) {
+                contributeModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        });
+    }
+    
+    // Copy address
+    const copyBtn = document.getElementById('copyAddressBtn');
+    const copyText = document.getElementById('copyText');
+    const copyIcon = document.getElementById('copyIcon');
+    const copiedFeedback = document.getElementById('copiedFeedback');
+    const kaspaAddress = document.getElementById('kaspaAddress');
+    
+    if (copyBtn && kaspaAddress) {
+        copyBtn.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(kaspaAddress.textContent.trim());
+                
+                // Show feedback
+                if (copyText) copyText.textContent = 'Copied';
+                if (copyIcon) copyIcon.textContent = '✓';
+                if (copiedFeedback) copiedFeedback.classList.remove('hidden');
+                
+                // Reset after 2 seconds
+                setTimeout(() => {
+                    if (copyText) copyText.textContent = 'Copy';
+                    if (copyIcon) copyIcon.textContent = '⎘';
+                    if (copiedFeedback) copiedFeedback.classList.add('hidden');
+                }, 2000);
+            } catch (err) {
+                // Fallback for older browsers
+                const textarea = document.createElement('textarea');
+                textarea.value = kaspaAddress.textContent.trim();
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                
+                if (copyText) copyText.textContent = 'Copied';
+                if (copyIcon) copyIcon.textContent = '✓';
+                if (copiedFeedback) copiedFeedback.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    if (copyText) copyText.textContent = 'Copy';
+                    if (copyIcon) copyIcon.textContent = '⎘';
+                    if (copiedFeedback) copiedFeedback.classList.add('hidden');
+                }, 2000);
+            }
+        });
+    }
+    
+    // Close modals with Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            [supportModal, contributeModal].forEach(modal => {
+                if (modal && !modal.classList.contains('hidden')) {
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = '';
+                }
+            });
+        }
+    });
+});

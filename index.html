@@ -54,6 +54,98 @@
     <footer>
         <p>Toccata hard fork — June 2026. This guide is a community resource.</p>
     </footer>
+    
+    <!-- Elegant Protocol Footer -->
+<footer class="protocol-footer">
+    <div class="footer-rule"></div>
+    
+    <p class="footer-note">Toccata Guide is an independent educational project exploring Kaspa's evolving architecture and programmability.</p>
+    
+    <nav class="footer-links" aria-label="Footer navigation">
+        <a href="https://github.com/weirdtualguy/toccata-guide" 
+           target="_blank" 
+           rel="noopener" 
+           class="footer-link"
+           aria-label="View source on GitHub">
+            <span class="link-label">GitHub</span>
+            <span class="link-arrow">↗</span>
+        </a>
+        
+        <span class="footer-sep" aria-hidden="true"></span>
+        
+        <button id="contributeBtn" 
+                class="footer-link" 
+                aria-label="Contribute to this guide">
+            <span class="link-label">Contribute</span>
+        </button>
+        
+        <span class="footer-sep" aria-hidden="true"></span>
+        
+        <button id="supportBtn" 
+                class="footer-link" 
+                aria-label="Support this project">
+            <span class="link-label">Support</span>
+        </button>
+        
+        <span class="footer-sep" aria-hidden="true"></span>
+        
+        <a href="https://x.com/weirdtualguy" 
+           target="_blank" 
+           rel="noopener" 
+           class="footer-link"
+           aria-label="Follow on X">
+            <span class="link-label">X</span>
+            <span class="link-arrow">↗</span>
+        </a>
+    </nav>
+    
+    <p class="footer-close">Toccata hard fork — June 2026</p>
+</footer>
+
+<!-- Support Modal -->
+<div id="supportModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="supportTitle">
+    <div class="modal-panel">
+        <button id="closeSupportModal" class="modal-close" aria-label="Close support panel">
+            <span aria-hidden="true">×</span>
+        </button>
+        
+        <h3 id="supportTitle" class="modal-title">Support This Guide</h3>
+        
+        <p class="modal-text">If this resource has been valuable, support is welcome but never expected.</p>
+        
+        <div class="address-container">
+            <code class="kaspa-address" id="kaspaAddress">kaspa:qp4ljl85vxf6wfj5m46txm9rdnnxdrjwm53wzjhh2we83u2fs8xm5mk5rknv0</code>
+            
+            <button id="copyAddressBtn" class="copy-btn" aria-label="Copy address to clipboard">
+                <span id="copyIcon">⎘</span>
+                <span id="copyText">Copy</span>
+            </button>
+        </div>
+        
+        <p id="copiedFeedback" class="copied-feedback hidden" aria-live="polite">Copied</p>
+    </div>
+</div>
+
+<!-- Contribute Modal -->
+<div id="contributeModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="contributeTitle">
+    <div class="modal-panel">
+        <button id="closeContributeModal" class="modal-close" aria-label="Close contribute panel">
+            <span aria-hidden="true">×</span>
+        </button>
+        
+        <h3 id="contributeTitle" class="modal-title">Contribute</h3>
+        
+        <p class="modal-text">Contributions, corrections, architectural discussions, and improvements are welcome.</p>
+        
+        <a href="https://github.com/weirdtualguy/toccata-guide" 
+           target="_blank" 
+           rel="noopener" 
+           class="modal-github-link"
+           aria-label="Open GitHub repository">
+            Open GitHub Repository ↗
+        </a>
+    </div>
+</div>
 
     <script src="js/search.js"></script>
     <script src="js/main.js"></script>
