@@ -37,6 +37,7 @@ class SearchManager {
         for (const [key, cat] of Object.entries(content.categories)) {
             for (const sec of cat.sections) {
                 const text = [
+                    sec.title || '',
                     sec.reality_shift || '',
                     sec.mental_model || '',
                     sec.mechanism || '',
@@ -65,17 +66,38 @@ class SearchManager {
         }
 
         const lowerQuery = q.toLowerCase();
-        const results = this.index
-            .filter(item => item.text.toLowerCase().includes(lowerQuery))
+        
+        // Score results: title matches first, then content matches
+        const scored = this.index
+            .map(item => {
+                const titleLower = item.title.toLowerCase();
+                const textLower = item.text.toLowerCase();
+                let score = 0;
+                
+                // Exact title match = highest priority
+                if (titleLower === lowerQuery) score = 100;
+                // Title starts with query = high priority
+                else if (titleLower.startsWith(lowerQuery)) score = 50;
+                // Title contains query = medium priority
+                else if (titleLower.includes(lowerQuery)) score = 30;
+                // Content contains query = low priority
+                else if (textLower.includes(lowerQuery)) score = 10;
+                // No match
+                else score = 0;
+                
+                return { ...item, score };
+            })
+            .filter(item => item.score > 0)
+            .sort((a, b) => b.score - a.score)
             .slice(0, 8);
 
-        if (results.length === 0) {
+        if (scored.length === 0) {
             this.results.innerHTML = `
                 <div class="search-result-item">
                     <span style="color: var(--text-muted);">No results found</span>
                 </div>`;
         } else {
-            this.results.innerHTML = results.map(r => `
+            this.results.innerHTML = scored.map(r => `
                 <div class="search-result-item" data-cat="${r.catKey}" data-sec="${r.id}" role="button" tabindex="0">
                     <strong>${r.title}</strong>
                     <br><small>${r.catTitle}</small>

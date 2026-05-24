@@ -853,3 +853,12 @@ footer p {
         color: black;
     }
 }
+
+/* ========== BACK BUTTON & ACCORDION SPACING FIX ========== */
+.accordion-container {
+    margin-bottom: 2.5rem;
+}
+
+.category-view-header {
+    margin-top: 1rem;
+}
