@@ -854,11 +854,10 @@ footer p {
     }
 }
 
-/* ========== BACK BUTTON & ACCORDION SPACING FIX ========== */
-.accordion-container {
-    margin-bottom: 2.5rem;
+#backButton {
+    margin-bottom: 1.5rem;
 }
 
-.category-view-header {
-    margin-top: 1rem;
+#categoryView {
+    padding-top: 0.5rem;
 }
